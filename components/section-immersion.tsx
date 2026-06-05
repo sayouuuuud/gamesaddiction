@@ -109,20 +109,29 @@ export function SectionImmersion() {
       // the flanking copy slides away + fades as you cross the threshold into
       // the frame. starts only AFTER the hold, so the grow is a deliberate act.
       const openAt = hold
-      const openDur = 6
-      tl.to(wrap, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: openDur }, openAt)
+      const openDur = 9
+      // smooth, eased reveal so the frame glides open and *settles* into
+      // full-bleed instead of snapping. power2.inOut = slow start, steady
+      // middle, gentle landing — the cinematic "step inside" feel.
+      tl.to(
+        wrap,
+        { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: openDur, ease: "power2.inOut" },
+        openAt,
+      )
         .to(
           video,
           {
             scale: endScale,
             filter: "brightness(1) saturate(1.18) contrast(1.08)",
             duration: openDur,
+            ease: "power2.inOut",
           },
           openAt,
         )
-        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: openDur * 0.5, ease: "power2.in" }, openAt)
-        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: openDur * 0.5, ease: "power2.in" }, openAt)
-        .to("[data-intro-hint]", { autoAlpha: 0, duration: openDur * 0.3, ease: "power2.in" }, openAt)
+        // copy clears early and softly as the frame begins to open
+        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: openDur * 0.4, ease: "power2.inOut" }, openAt)
+        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: openDur * 0.4, ease: "power2.inOut" }, openAt)
+        .to("[data-intro-hint]", { autoAlpha: 0, duration: openDur * 0.25, ease: "power2.in" }, openAt)
 
       const fmt = (s: number) => {
         const m = Math.floor(s / 60)
