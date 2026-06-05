@@ -102,26 +102,27 @@ export function SectionImmersion() {
       // copy stay perfectly still for a good stretch of scroll. This guarantees
       // the viewer actually registers the "small video in the middle, text on
       // each side" state before anything starts moving.
-      const hold = 3
+      const hold = 4
       tl.to({}, { duration: hold })
 
       // the footage opens up and engulfs the viewport — the "sinking in".
       // the flanking copy slides away + fades as you cross the threshold into
       // the frame. starts only AFTER the hold, so the grow is a deliberate act.
       const openAt = hold
-      tl.to(wrap, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 2 }, openAt)
+      const openDur = 6
+      tl.to(wrap, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: openDur }, openAt)
         .to(
           video,
           {
             scale: endScale,
             filter: "brightness(1) saturate(1.18) contrast(1.08)",
-            duration: 2,
+            duration: openDur,
           },
           openAt,
         )
-        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: 1, ease: "power2.in" }, openAt)
-        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: 1, ease: "power2.in" }, openAt)
-        .to("[data-intro-hint]", { autoAlpha: 0, duration: 0.6, ease: "power2.in" }, openAt)
+        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: openDur * 0.5, ease: "power2.in" }, openAt)
+        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: openDur * 0.5, ease: "power2.in" }, openAt)
+        .to("[data-intro-hint]", { autoAlpha: 0, duration: openDur * 0.3, ease: "power2.in" }, openAt)
 
       const fmt = (s: number) => {
         const m = Math.floor(s / 60)
@@ -139,7 +140,7 @@ export function SectionImmersion() {
       // evenly across the whole scroll, each getting a generous dwell so a
       // normal-speed scroll still lands on every one. Each note draws in, holds,
       // then clears as the next takes its place.
-      const startAt = openAt + 2 // right after the clip finishes opening
+      const startAt = openAt + openDur // right after the clip finishes opening
       const seg = 5 // scroll "distance" each note owns
       const fadeOut = 0.8
       sceneEls.forEach((el, i) => {
@@ -180,7 +181,7 @@ export function SectionImmersion() {
     <section
       ref={sectionRef}
       id="immersion"
-      className="relative h-[640vh] bg-[oklch(0.035_0.012_280)] text-[oklch(0.93_0.004_280)]"
+      className="relative h-[820vh] bg-[oklch(0.035_0.012_280)] text-[oklch(0.93_0.004_280)]"
       aria-label="Inside the loop — immersive footage"
     >
       <div ref={stageRef} className="sticky top-0 flex h-svh items-center justify-center overflow-hidden">
