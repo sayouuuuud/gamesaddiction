@@ -79,17 +79,13 @@ export function SectionSigns() {
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            // One viewport of scroll per step transition.
+            // One viewport of scroll per step transition. No snap, so the text
+            // glides freely with the scroll like a normal long page; the image
+            // stays pinned through every step and only releases (scrolls away
+            // with the whole section) once the last step is reached.
             end: () => "+=" + window.innerHeight * (count - 1),
             pin: true,
             scrub: 0.6,
-            // Rest on each step; the last one rests at progress 1 (pin end), so
-            // reading it and scrolling on releases the whole section naturally.
-            snap: {
-              snapTo: gsap.utils.snap(1 / (count - 1)),
-              duration: { min: 0.2, max: 0.5 },
-              ease: "power1.inOut",
-            },
           },
         })
 
