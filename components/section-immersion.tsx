@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import { useGSAP } from "@gsap/react"
-import { gsap, ScrollTrigger } from "@/lib/gsap"
+import { gsap } from "@/lib/gsap"
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -66,43 +66,21 @@ export function SectionImmersion() {
       const sceneEls = gsap.utils.toArray<HTMLElement>("[data-scene]")
       if (!section || !wrap || !video) return
 
-      if (prefersReducedMotion()) {
-        // Reduced motion: skip the cinematic clip/scale animation, but STILL
-        // step through every annotation as the user scrolls — just with instant
-        // swaps instead of tweens, so all four points remain reachable.
-        gsap.set(wrap, { clipPath: "inset(0% round 0px)" })
-        gsap.set("[data-intro]", { autoAlpha: 0 })
-        gsap.set(sceneEls, { autoAlpha: 0, y: 0 })
-        gsap.set(sceneEls[0], { autoAlpha: 1 })
-
-        let activeIdx = 0
-        const apply = (idx: number) => {
-          if (idx === activeIdx) return
-          gsap.set(sceneEls, { autoAlpha: 0 })
-          gsap.set(sceneEls[idx], { autoAlpha: 1 })
-          if (stateRef.current) stateRef.current.textContent = states[idx]
-          activeIdx = idx
-        }
-
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            const idx = Math.min(scenes.length - 1, Math.floor(self.progress * scenes.length))
-            apply(idx)
-            if (meterRef.current) meterRef.current.style.transform = `scaleX(${0.04 + self.progress * 0.96})`
-          },
-        })
-        return
-      }
+      // EVERYONE gets the framed-clip → full-bleed "step inside" reveal. When
+      // the user prefers reduced motion we only soften the heavy parallax zoom
+      // on the footage itself (the part most likely to cause discomfort) — the
+      // small-window intro, the flanking copy and the A1→A4 annotations all
+      // still play, so the experience the user asked for is never skipped.
+      const rm = prefersReducedMotion()
+      const startScale = rm ? 1.12 : 1.32
+      const endScale = rm ? 1 : 1.04
 
       // START: a small framed clip floating in the dark, dead-center, with the
       // explainer copy flanking it left + right. Only the middle of the footage
       // shows through the tight clip window, so it reads as a small screen.
       gsap.set(wrap, { clipPath: "inset(24% 34% 24% 34% round 14px)" })
       gsap.set(video, {
-        scale: 1.32,
+        scale: startScale,
         filter: "brightness(0.46) saturate(0.5) contrast(1.06)",
       })
       gsap.set("[data-intro]", { autoAlpha: 1 })
@@ -120,22 +98,30 @@ export function SectionImmersion() {
         },
       })
 
+      // HOLD: once the section is pinned, the small framed clip + the flanking
+      // copy stay perfectly still for a good stretch of scroll. This guarantees
+      // the viewer actually registers the "small video in the middle, text on
+      // each side" state before anything starts moving.
+      const hold = 3
+      tl.to({}, { duration: hold })
+
       // the footage opens up and engulfs the viewport — the "sinking in".
       // the flanking copy slides away + fades as you cross the threshold into
-      // the frame. kept short (2 units) so the first annotation lands soon after.
-      tl.to(wrap, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 2 }, 0)
+      // the frame. starts only AFTER the hold, so the grow is a deliberate act.
+      const openAt = hold
+      tl.to(wrap, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 2 }, openAt)
         .to(
           video,
           {
-            scale: 1.04,
+            scale: endScale,
             filter: "brightness(1) saturate(1.18) contrast(1.08)",
             duration: 2,
           },
-          0,
+          openAt,
         )
-        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: 1, ease: "power2.in" }, 0)
-        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: 1, ease: "power2.in" }, 0)
-        .to("[data-intro-hint]", { autoAlpha: 0, duration: 0.6, ease: "power2.in" }, 0)
+        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: 1, ease: "power2.in" }, openAt)
+        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: 1, ease: "power2.in" }, openAt)
+        .to("[data-intro-hint]", { autoAlpha: 0, duration: 0.6, ease: "power2.in" }, openAt)
 
       const fmt = (s: number) => {
         const m = Math.floor(s / 60)
@@ -153,7 +139,7 @@ export function SectionImmersion() {
       // evenly across the whole scroll, each getting a generous dwell so a
       // normal-speed scroll still lands on every one. Each note draws in, holds,
       // then clears as the next takes its place.
-      const startAt = 2 // right after the clip finishes opening
+      const startAt = openAt + 2 // right after the clip finishes opening
       const seg = 5 // scroll "distance" each note owns
       const fadeOut = 0.8
       sceneEls.forEach((el, i) => {
@@ -194,7 +180,7 @@ export function SectionImmersion() {
     <section
       ref={sectionRef}
       id="immersion"
-      className="relative h-[560vh] bg-[oklch(0.035_0.012_280)] text-[oklch(0.93_0.004_280)]"
+      className="relative h-[640vh] bg-[oklch(0.035_0.012_280)] text-[oklch(0.93_0.004_280)]"
       aria-label="Inside the loop — immersive footage"
     >
       <div ref={stageRef} className="sticky top-0 flex h-svh items-center justify-center overflow-hidden">
