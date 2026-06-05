@@ -15,13 +15,13 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     if (reduce) return
 
+    // NOTE: when `lerp` is set, Lenis uses it and IGNORES `duration`/`easing`.
+    // `lerp` is the real "weight" control here: lower = heavier / more drag.
     const lenis = new Lenis({
-      duration: 10,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.04,
       smoothWheel: true,
-      wheelMultiplier: 0.14,
-      touchMultiplier: 0.6,
-      lerp: 0.009,
+      wheelMultiplier: 0.8,
+      touchMultiplier: 1,
     })
 
     lenis.on("scroll", ScrollTrigger.update)
