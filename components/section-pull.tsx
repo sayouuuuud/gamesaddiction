@@ -18,8 +18,8 @@ export function SectionPull() {
       {/* Editorial headline with inline collage images */}
       <VelocitySkew className="relative">
         <LineReveal
-          className="display max-w-5xl text-foreground"
-          lineClassName="text-[9vw] leading-[0.95] md:text-[5.5vw]"
+          className="display max-w-7xl text-foreground"
+          lineClassName="text-[9vw] font-bold! leading-[0.95] md:text-[5.5vw]"
           lines={[
             <>Games are not</>,
             <>
