@@ -292,15 +292,17 @@ export function Hero() {
                 </svg>
                 <div
                   data-anno-box
-                  className={`absolute max-w-[230px] ${a.align === "right" ? "-translate-x-full text-right" : ""}`}
+                  className={`absolute max-w-[340px] ${a.align === "right" ? "-translate-x-full text-right" : ""}`}
                   style={{
                     left: `${end.x}%`,
                     top: `${end.y}%`,
                     transform: `translateY(-50%) ${a.align === "right" ? "translateX(-10px)" : "translateX(10px)"}`,
                   }}
                 >
-                  <span className="hud text-signal">{a.index}</span>
-                  <p className="hud mt-1 leading-relaxed text-foreground">{a.label}</p>
+                  <span className="hud text-lg text-signal md:text-xl">{a.index}</span>
+                  <p className="mt-2 font-mono text-base uppercase leading-relaxed tracking-wide text-foreground md:text-lg lg:text-xl">
+                    {a.label}
+                  </p>
                 </div>
               </div>
             )

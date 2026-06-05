@@ -65,12 +65,36 @@ export function SectionHorizontal() {
     <section
       ref={sectionRef}
       aria-label="The real cost and the way back"
-      className="relative w-full md:h-svh md:overflow-hidden"
+      className="relative w-full bg-[oklch(0.035_0.012_280)] md:h-svh md:overflow-hidden"
     >
       <div
         ref={trackRef}
         className="flex w-full flex-col md:h-svh md:w-max md:flex-row md:flex-nowrap"
       >
+        {/* BRIDGE — desktop only. A dark beat that continues straight out of the
+            full-bleed footage, so the sideways journey *starts from the video*.
+            As you scroll it slides away to the left and THE REAL COST arrives
+            from the right. Hidden on mobile, where the sections just stack. */}
+        <div
+          data-panel
+          className="fx-grain relative hidden md:flex md:h-svh md:w-screen md:shrink-0 md:flex-col md:items-center md:justify-center md:overflow-hidden md:bg-[oklch(0.035_0.012_280)] md:text-[oklch(0.93_0.004_280)]"
+        >
+          <div className="fx-vignette pointer-events-none absolute inset-0" />
+          <span className="hud text-[oklch(0.93_0.004_280)]/60">/02·5 — END OF FOOTAGE</span>
+          <h2 className="display mt-5 max-w-3xl text-balance px-6 text-center text-5xl leading-[0.95] lg:text-7xl">
+            You&apos;ve felt the pull.
+            <br />
+            Now count the <span className="text-signal">cost.</span>
+          </h2>
+          <span className="hud mt-8 flex items-center gap-3 text-[oklch(0.93_0.004_280)]/70">
+            SCROLL
+            <span className="inline-block h-px w-12 bg-signal" aria-hidden="true" />
+            <span className="text-signal" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </div>
+
         <div
           data-panel
           className="w-full md:h-svh md:w-screen md:shrink-0 md:overflow-hidden"
