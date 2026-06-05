@@ -75,7 +75,7 @@ export function SectionRecovery({ panel = false }: { panel?: boolean }) {
             >
               <span className="hud pt-1 text-signal">{step.n}</span>
               <div>
-                <h3 className="display text-2xl text-foreground">{step.title}</h3>
+                <h3 className="display display-geist text-2xl text-foreground">{step.title}</h3>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{step.body}</p>
               </div>
             </Reveal>
@@ -92,7 +92,7 @@ export function SectionRecovery({ panel = false }: { panel?: boolean }) {
           </div>
           <h3
             className={cn(
-              "display max-w-4xl text-pretty leading-[0.95] text-foreground",
+              "display display-geist max-w-4xl text-pretty leading-[0.95] text-foreground",
               panel ? "text-[7vw] md:text-[2.6vw]" : "text-[8vw] md:text-[4vw]",
             )}
           >
