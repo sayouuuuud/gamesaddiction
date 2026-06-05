@@ -3,8 +3,7 @@ import { Hero } from "@/components/hero"
 import { SectionPull } from "@/components/section-pull"
 import { SectionSigns } from "@/components/section-signs"
 import { SectionImmersion } from "@/components/section-immersion"
-import { SectionToll } from "@/components/section-toll"
-import { SectionRecovery } from "@/components/section-recovery"
+import { SectionHorizontal } from "@/components/section-horizontal"
 import { SiteFooter } from "@/components/site-footer"
 
 export default function Page() {
@@ -15,8 +14,7 @@ export default function Page() {
       <SectionPull />
       <SectionSigns />
       <SectionImmersion />
-      <SectionToll />
-      <SectionRecovery />
+      <SectionHorizontal />
       <SiteFooter />
     </main>
   )

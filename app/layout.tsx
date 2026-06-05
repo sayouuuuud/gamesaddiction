@@ -19,6 +19,14 @@ const blanka = localFont({
   display: 'swap',
 })
 
+// Aquire — geometric display face used for every section heading (the hero
+// keeps its own Blanka face). Wired to --font-heading via globals.css.
+const aquire = localFont({
+  src: '../public/fonts/Aquire-BW0ox.otf',
+  variable: '--font-aquire',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'RECLAIM — Gaming Addiction, By Design',
   description:
@@ -34,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${blanka.variable} bg-background`}
+      className={`${geistSans.variable} ${geistMono.variable} ${blanka.variable} ${aquire.variable} bg-background`}
     >
       <body className="font-sans antialiased">
         <Preloader />
