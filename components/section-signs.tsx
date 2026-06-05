@@ -1,7 +1,48 @@
 "use client"
 
+import { useRef } from "react"
 import Image from "next/image"
-import { LineReveal, MediaReveal, Parallax, Reveal, Scramble, VelocitySkew } from "@/components/anim"
+import { useGSAP } from "@gsap/react"
+import { gsap } from "@/lib/gsap"
+import { MediaReveal, Reveal, Scramble } from "@/components/anim"
+
+const steps = [
+  {
+    heading: (
+      <>
+        When does
+        <br />a hobby become
+        <br />a <span className="text-signal">hold?</span>
+      </>
+    ),
+    body: "No single sign means addiction. But if several feel familiar — for you or someone you love — it may be worth a closer look.",
+    fig: "FIG. 02 — THE BLUE-LIGHT TRANCE",
+  },
+  {
+    heading: (
+      <>
+        It always
+        <br />starts the
+        <br />
+        <span className="text-signal">same way</span>
+      </>
+    ),
+    body: "“Just one more match.” One more level, one more reward — and the night quietly disappears without you noticing.",
+    fig: "FIG. 02.1 — ONE MORE MATCH",
+  },
+  {
+    heading: (
+      <>
+        Until the
+        <br />game starts
+        <br />
+        <span className="text-signal">keeping you</span>
+      </>
+    ),
+    body: "Sleep, focus, and the people around you slowly become small trades you barely remember agreeing to.",
+    fig: "FIG. 02.2 — THE QUIET COST",
+  },
+]
 
 const signs = [
   { n: "S01", title: "Losing track of time", body: "Sessions meant to be an hour stretch into the early morning, again and again." },
@@ -13,6 +54,59 @@ const signs = [
 ]
 
 export function SectionSigns() {
+  const pinRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      const el = pinRef.current
+      if (!el) return
+
+      const mm = gsap.matchMedia()
+
+      // Pinned, scroll-driven story — desktop only.
+      mm.add("(min-width: 768px)", () => {
+        const panels = gsap.utils.toArray<HTMLElement>("[data-panel]", el)
+        const caps = gsap.utils.toArray<HTMLElement>("[data-cap]", el)
+        const count = panels.length
+
+        // Initial state: only the first step visible.
+        gsap.set(panels, { autoAlpha: 0, yPercent: 8 })
+        gsap.set(caps, { autoAlpha: 0 })
+        gsap.set([panels[0], caps[0]], { autoAlpha: 1, yPercent: 0 })
+
+        const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: {
+            trigger: el,
+            start: "top top",
+            // One full viewport of scroll per transition between steps.
+            end: () => "+=" + window.innerHeight * (count - 1),
+            pin: true,
+            scrub: 0.6,
+            snap: {
+              snapTo: gsap.utils.snap(1 / (count - 1)),
+              duration: { min: 0.2, max: 0.5 },
+              ease: "power1.inOut",
+            },
+          },
+        })
+
+        for (let i = 1; i < count; i++) {
+          tl.to([panels[i - 1], caps[i - 1]], { autoAlpha: 0, yPercent: -8 }, i)
+            .fromTo(
+              [panels[i], caps[i]],
+              { autoAlpha: 0, yPercent: 8 },
+              { autoAlpha: 1, yPercent: 0 },
+              i,
+            )
+        }
+      })
+
+      return () => mm.revert()
+    },
+    { scope: pinRef },
+  )
+
   return (
     <section
       id="signs"
@@ -24,24 +118,30 @@ export function SectionSigns() {
         <span className="h-px flex-1 bg-foreground/15" />
       </Reveal>
 
-      <div className="grid gap-12 md:grid-cols-[1.1fr_0.9fr] md:gap-20">
-        <div>
-          <VelocitySkew>
-            <LineReveal
-              className="display text-foreground"
-              lineClassName="text-[10vw] leading-[0.95] md:text-[5vw]"
-              lines={[<>When does</>, <>a hobby become</>, <>a <span className="text-signal">hold?</span></>]}
-            />
-          </VelocitySkew>
-          <Reveal className="mt-8 max-w-md" delay={0.1}>
-            <p className="text-pretty leading-relaxed text-muted-foreground">
-              No single sign means addiction. But if several feel familiar — for
-              you or someone you love — it may be worth a closer look.
-            </p>
-          </Reveal>
+      <div
+        ref={pinRef}
+        className="grid gap-12 md:min-h-[78vh] md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-20"
+      >
+        {/* Left: scroll-driven text steps */}
+        <div className="relative md:min-h-[26em]">
+          {steps.map((step, i) => (
+            <div
+              key={i}
+              data-panel
+              className="md:absolute md:inset-0 md:flex md:flex-col md:justify-center [&:not(:first-child)]:mt-20 md:[&:not(:first-child)]:mt-0"
+            >
+              <h2 className="display text-balance text-[10vw] leading-[0.95] text-foreground md:text-[5vw]">
+                {step.heading}
+              </h2>
+              <p className="mt-8 max-w-md text-pretty leading-relaxed text-muted-foreground">
+                {step.body}
+              </p>
+            </div>
+          ))}
         </div>
 
-        <Parallax distance={60} className="relative hidden md:block">
+        {/* Right: pinned image with a changing caption */}
+        <div className="relative hidden md:block">
           <MediaReveal className="rounded-md">
             <Image
               src="/collage/screen-face.png"
@@ -51,10 +151,18 @@ export function SectionSigns() {
               className="h-auto w-full grayscale"
             />
           </MediaReveal>
-          <div className="hud absolute -bottom-3 left-3 bg-background px-2 py-1 text-muted-foreground">
-            FIG. 02 — THE BLUE-LIGHT TRANCE
+          <div className="absolute -bottom-3 left-3 h-6">
+            {steps.map((step, i) => (
+              <div
+                key={i}
+                data-cap
+                className="hud absolute bottom-0 left-0 whitespace-nowrap bg-background px-2 py-1 text-muted-foreground"
+              >
+                {step.fig}
+              </div>
+            ))}
           </div>
-        </Parallax>
+        </div>
       </div>
 
       {/* Signs as a technical checklist grid */}
