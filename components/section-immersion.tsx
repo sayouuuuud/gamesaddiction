@@ -71,6 +71,7 @@ export function SectionImmersion() {
         // step through every annotation as the user scrolls — just with instant
         // swaps instead of tweens, so all four points remain reachable.
         gsap.set(wrap, { clipPath: "inset(0% round 0px)" })
+        gsap.set("[data-intro]", { autoAlpha: 0 })
         gsap.set(sceneEls, { autoAlpha: 0, y: 0 })
         gsap.set(sceneEls[0], { autoAlpha: 1 })
 
@@ -96,13 +97,18 @@ export function SectionImmersion() {
         return
       }
 
-      // start: a small, dim, desaturated frame floating in the dark
-      gsap.set(wrap, { clipPath: "inset(15% 22% 15% 22% round 16px)" })
+      // START: a small framed clip floating in the dark, dead-center, with the
+      // explainer copy flanking it left + right. Only the middle of the footage
+      // shows through the tight clip window, so it reads as a small screen.
+      gsap.set(wrap, { clipPath: "inset(24% 34% 24% 34% round 14px)" })
       gsap.set(video, {
-        scale: 1.22,
-        filter: "brightness(0.42) saturate(0.5) contrast(1.06)",
+        scale: 1.32,
+        filter: "brightness(0.46) saturate(0.5) contrast(1.06)",
       })
-      gsap.set(sceneEls, { autoAlpha: 0, y: 24 })
+      gsap.set("[data-intro]", { autoAlpha: 1 })
+      gsap.set("[data-side='left']", { xPercent: 0 })
+      gsap.set("[data-side='right']", { xPercent: 0 })
+      gsap.set(sceneEls, { autoAlpha: 0, y: 28 })
 
       const tl = gsap.timeline({
         defaults: { ease: "none" },
@@ -115,7 +121,8 @@ export function SectionImmersion() {
       })
 
       // the footage opens up and engulfs the viewport — the "sinking in".
-      // kept short (2 units) so the first annotation lands almost immediately
+      // the flanking copy slides away + fades as you cross the threshold into
+      // the frame. kept short (2 units) so the first annotation lands soon after.
       tl.to(wrap, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 2 }, 0)
         .to(
           video,
@@ -126,6 +133,9 @@ export function SectionImmersion() {
           },
           0,
         )
+        .to("[data-side='left']", { autoAlpha: 0, xPercent: -45, duration: 1, ease: "power2.in" }, 0)
+        .to("[data-side='right']", { autoAlpha: 0, xPercent: 45, duration: 1, ease: "power2.in" }, 0)
+        .to("[data-intro-hint]", { autoAlpha: 0, duration: 0.6, ease: "power2.in" }, 0)
 
       const fmt = (s: number) => {
         const m = Math.floor(s / 60)
@@ -150,13 +160,13 @@ export function SectionImmersion() {
         const at = startAt + i * seg
         tl.fromTo(
           el,
-          { autoAlpha: 0, y: 24 },
+          { autoAlpha: 0, y: 28 },
           { autoAlpha: 1, y: 0, duration: 0.8, ease: "power2.out" },
           at,
         )
         // every note except the last clears just before the next arrives
         if (i < sceneEls.length - 1) {
-          tl.to(el, { autoAlpha: 0, y: -24, duration: fadeOut, ease: "power2.in" }, at + seg - fadeOut)
+          tl.to(el, { autoAlpha: 0, y: -28, duration: fadeOut, ease: "power2.in" }, at + seg - fadeOut)
         }
         // sync the SUBJECT STATE label with the active note (forwards + reverse)
         tl.call(() => setState(i), [], at)
@@ -184,11 +194,11 @@ export function SectionImmersion() {
     <section
       ref={sectionRef}
       id="immersion"
-      className="relative h-[520vh] bg-[oklch(0.035_0.012_280)] text-[oklch(0.93_0.004_280)]"
+      className="relative h-[560vh] bg-[oklch(0.035_0.012_280)] text-[oklch(0.93_0.004_280)]"
       aria-label="Inside the loop — immersive footage"
     >
       <div ref={stageRef} className="sticky top-0 flex h-svh items-center justify-center overflow-hidden">
-        {/* the footage — opens from a framed clip to full-bleed */}
+        {/* the footage — opens from a small framed clip to full-bleed */}
         <div ref={wrapRef} className="fx-grain absolute inset-0 h-full w-full overflow-hidden">
           <video
             ref={videoRef}
@@ -204,6 +214,47 @@ export function SectionImmersion() {
           {/* cinematic depth overlays */}
           <div className="fx-vignette pointer-events-none absolute inset-0" />
           <div className="fx-scanlines pointer-events-none absolute inset-0 opacity-30" />
+        </div>
+
+        {/* INTRO copy flanking the small frame — fades + slides off as you enter */}
+        <div
+          data-intro
+          data-side="left"
+          className="pointer-events-none absolute left-0 top-1/2 hidden w-[30%] max-w-xs -translate-y-1/2 px-6 text-left md:block lg:px-10"
+        >
+          <span className="hud text-signal">/02·5 — FIELD FOOTAGE</span>
+          <h3 className="display mt-3 text-balance text-2xl leading-[0.95] text-[oklch(0.93_0.004_280)] lg:text-3xl">
+            Press play on a real session.
+          </h3>
+          <p className="mt-3 text-pretty text-sm leading-relaxed text-[oklch(0.93_0.004_280)]/65">
+            What you&apos;re watching isn&apos;t staged — it&apos;s the same loop running in
+            millions of dark rooms right now, lit only by a screen.
+          </p>
+        </div>
+
+        <div
+          data-intro
+          data-side="right"
+          className="pointer-events-none absolute right-0 top-1/2 hidden w-[30%] max-w-xs -translate-y-1/2 px-6 text-right md:block lg:px-10"
+        >
+          <span className="hud text-[oklch(0.93_0.004_280)]/60">SUBJECT // ENGAGED</span>
+          <h3 className="display mt-3 text-balance text-2xl leading-[0.95] text-[oklch(0.93_0.004_280)] lg:text-3xl">
+            Scroll to step inside.
+          </h3>
+          <p className="mt-3 text-pretty text-sm leading-relaxed text-[oklch(0.93_0.004_280)]/65">
+            Keep scrolling and the frame opens up around you. You stop watching from
+            the outside — and drop into the loop itself.
+          </p>
+        </div>
+
+        {/* scroll hint, centered under the small frame on every screen size */}
+        <div
+          data-intro
+          data-intro-hint
+          className="pointer-events-none absolute inset-x-0 bottom-[14%] flex flex-col items-center gap-2 md:bottom-[16%]"
+        >
+          <span className="hud text-[oklch(0.93_0.004_280)]/70">SCROLL TO ENTER</span>
+          <span className="block h-8 w-px animate-pulse bg-signal" aria-hidden="true" />
         </div>
 
         {/* top HUD bar */}
@@ -222,22 +273,24 @@ export function SectionImmersion() {
         </div>
 
         {/* per-frame annotation — one note at a time, swapped as the scene changes */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-[16%] flex justify-center px-6 md:bottom-[20%]">
-          <div className="relative h-[7em] w-full max-w-2xl md:h-[6em]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[12%] flex justify-center px-6 md:bottom-[16%]">
+          <div className="relative h-[12em] w-full max-w-3xl md:h-[10em]">
             {scenes.map((s, i) => (
               <div
                 key={i}
                 data-scene
-                className="absolute inset-0 flex items-start gap-4"
+                className="absolute inset-0 flex items-start gap-4 md:gap-6"
               >
                 {/* index marker, drawn like the brain-figure callouts */}
-                <span className="hud flex shrink-0 items-center gap-2 text-signal">
-                  <span className="h-2 w-2 rounded-full bg-signal" />
+                <span className="hud flex shrink-0 items-center gap-2 text-base text-signal md:text-lg">
+                  <span className="h-2.5 w-2.5 rounded-full bg-signal" />
                   {s.k}
                 </span>
-                <span className="flex-1 border-l border-signal/40 pl-4">
-                  <span className="display block text-xl leading-tight md:text-2xl">{s.title}</span>
-                  <span className="mt-1 block text-pretty text-sm leading-relaxed text-[oklch(0.93_0.004_280)]/75 md:text-base">
+                <span className="flex-1 border-l-2 border-signal/40 pl-5 md:pl-6">
+                  <span className="display block text-3xl leading-[0.95] text-balance md:text-5xl lg:text-6xl">
+                    {s.title}
+                  </span>
+                  <span className="mt-3 block text-pretty text-base leading-relaxed text-[oklch(0.93_0.004_280)]/80 md:text-xl">
                     {s.line}
                   </span>
                 </span>
