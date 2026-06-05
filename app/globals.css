@@ -140,12 +140,14 @@
     letter-spacing: -0.01em;
     line-height: 0.92;
   }
-  /* Opt back into the original Geist headline (bold + tight tracking) for the
-     few spots that should NOT use Aquire. */
+  /* The original Geist headline (bold + tight tracking). Self-contained and
+     used WITHOUT .display, because Tailwind v4 sorts utilities and would let
+     .display's Aquire font win over an override declared alongside it. */
   .display-geist {
     font-family: var(--font-geist-sans), 'Helvetica Neue', Arial, sans-serif;
     font-weight: 700;
     letter-spacing: -0.04em;
+    line-height: 0.92;
   }
   /* Blanka — outlined display face for the hero headline only.
      It is uppercase + fixed-width, so it needs positive tracking (the tight
