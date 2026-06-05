@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import { useGSAP } from "@gsap/react"
-import { gsap, ScrollTrigger } from "@/lib/gsap"
+import { gsap } from "@/lib/gsap"
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -66,43 +66,21 @@ export function SectionImmersion() {
       const sceneEls = gsap.utils.toArray<HTMLElement>("[data-scene]")
       if (!section || !wrap || !video) return
 
-      if (prefersReducedMotion()) {
-        // Reduced motion: skip the cinematic clip/scale animation, but STILL
-        // step through every annotation as the user scrolls — just with instant
-        // swaps instead of tweens, so all four points remain reachable.
-        gsap.set(wrap, { clipPath: "inset(0% round 0px)" })
-        gsap.set("[data-intro]", { autoAlpha: 0 })
-        gsap.set(sceneEls, { autoAlpha: 0, y: 0 })
-        gsap.set(sceneEls[0], { autoAlpha: 1 })
-
-        let activeIdx = 0
-        const apply = (idx: number) => {
-          if (idx === activeIdx) return
-          gsap.set(sceneEls, { autoAlpha: 0 })
-          gsap.set(sceneEls[idx], { autoAlpha: 1 })
-          if (stateRef.current) stateRef.current.textContent = states[idx]
-          activeIdx = idx
-        }
-
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            const idx = Math.min(scenes.length - 1, Math.floor(self.progress * scenes.length))
-            apply(idx)
-            if (meterRef.current) meterRef.current.style.transform = `scaleX(${0.04 + self.progress * 0.96})`
-          },
-        })
-        return
-      }
+      // EVERYONE gets the framed-clip → full-bleed "step inside" reveal. When
+      // the user prefers reduced motion we only soften the heavy parallax zoom
+      // on the footage itself (the part most likely to cause discomfort) — the
+      // small-window intro, the flanking copy and the A1→A4 annotations all
+      // still play, so the experience the user asked for is never skipped.
+      const rm = prefersReducedMotion()
+      const startScale = rm ? 1.12 : 1.32
+      const endScale = rm ? 1 : 1.04
 
       // START: a small framed clip floating in the dark, dead-center, with the
       // explainer copy flanking it left + right. Only the middle of the footage
       // shows through the tight clip window, so it reads as a small screen.
       gsap.set(wrap, { clipPath: "inset(24% 34% 24% 34% round 14px)" })
       gsap.set(video, {
-        scale: 1.32,
+        scale: startScale,
         filter: "brightness(0.46) saturate(0.5) contrast(1.06)",
       })
       gsap.set("[data-intro]", { autoAlpha: 1 })
@@ -135,7 +113,7 @@ export function SectionImmersion() {
         .to(
           video,
           {
-            scale: 1.04,
+            scale: endScale,
             filter: "brightness(1) saturate(1.18) contrast(1.08)",
             duration: 2,
           },
