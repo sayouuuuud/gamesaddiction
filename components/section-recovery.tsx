@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { LineReveal, Magnetic, Parallax, Reveal, Scramble } from "@/components/anim"
+import { cn } from "@/lib/utils"
 
 const steps = [
   { n: "01", title: "Name it without shame", body: "Addiction is a wiring problem, not a moral failing. Honesty is the doorway out." },
@@ -10,44 +11,56 @@ const steps = [
   { n: "04", title: "Reach for support", body: "Therapists, support groups, and loved ones make recovery far more likely to last." },
 ]
 
-export function SectionRecovery() {
+export function SectionRecovery({ panel = false }: { panel?: boolean }) {
   return (
     <section
       id="recovery"
-      className="relative overflow-hidden border-t border-foreground/15 px-5 py-32 md:px-6 md:py-48"
+      className={cn(
+        "relative overflow-hidden border-t border-foreground/15 px-5 md:px-10 lg:px-16",
+        panel
+          ? "flex flex-col justify-center py-24 md:h-full md:py-0"
+          : "py-32 md:py-48",
+      )}
     >
-      <Reveal className="hud mb-16 flex items-center gap-3 text-muted-foreground">
+      <Reveal
+        className={cn(
+          "hud flex items-center gap-3 text-muted-foreground",
+          panel ? "mb-10 md:mb-8" : "mb-16",
+        )}
+      >
         <span className="text-signal">/04</span>
         <Scramble text="THE WAY BACK" />
         <span className="h-px flex-1 bg-foreground/15" />
       </Reveal>
 
-      <div className="grid gap-12 md:grid-cols-[1fr_0.85fr] md:gap-20">
+      <div className={cn("grid gap-12 md:grid-cols-[1fr_0.85fr]", panel ? "md:gap-12" : "md:gap-20")}>
         <div className="relative">
           <LineReveal
             className="display text-foreground"
-            lineClassName="text-[10vw] leading-[0.95] md:text-[5vw]"
+            lineClassName={cn("leading-[0.95]", panel ? "text-[10vw] md:text-[4vw]" : "text-[10vw] md:text-[5vw]")}
             lines={[<>Recovery isn&apos;t</>, <>quitting games.</>, <>It&apos;s <span className="text-signal">reclaiming</span></>, <>yourself.</>]}
           />
-          <Reveal className="mt-8 max-w-md" delay={0.1}>
+          <Reveal className={cn("max-w-md", panel ? "mt-6" : "mt-8")} delay={0.1}>
             <p className="text-pretty leading-relaxed text-muted-foreground">
               Thousands have walked this path back to balance. The way out is
               rarely one big decision — it is a series of small, repeated ones.
             </p>
           </Reveal>
 
-          <Parallax
-            distance={50}
-            className="pointer-events-none absolute -bottom-16 right-0 hidden w-[20vw] max-w-[220px] md:block"
-          >
-            <Image
-              src="/collage/sprout-cut.png"
-              alt="A small green sprout growing"
-              width={440}
-              height={440}
-              className="h-auto w-full"
-            />
-          </Parallax>
+          {!panel && (
+            <Parallax
+              distance={50}
+              className="pointer-events-none absolute -bottom-16 right-0 hidden w-[20vw] max-w-[220px] md:block"
+            >
+              <Image
+                src="/collage/sprout-cut.png"
+                alt="A small green sprout growing"
+                width={440}
+                height={440}
+                className="h-auto w-full"
+              />
+            </Parallax>
+          )}
         </div>
 
         <div>
@@ -55,7 +68,10 @@ export function SectionRecovery() {
             <Reveal
               key={step.n}
               delay={i * 0.06}
-              className="group flex items-start gap-5 border-t border-foreground/15 py-6 last:border-b"
+              className={cn(
+                "group flex items-start gap-5 border-t border-foreground/15 last:border-b",
+                panel ? "py-4 md:py-3" : "py-6",
+              )}
             >
               <span className="hud pt-1 text-signal">{step.n}</span>
               <div>
@@ -68,17 +84,22 @@ export function SectionRecovery() {
       </div>
 
       {/* CTA */}
-      <Reveal className="mt-28">
-        <div className="border border-foreground bg-background p-8 md:p-16">
-          <div className="hud mb-8 flex items-center justify-between text-muted-foreground">
+      <Reveal className={cn(panel ? "mt-12 md:mt-10" : "mt-28")}>
+        <div className={cn("border border-foreground bg-background", panel ? "p-6 md:p-8" : "p-8 md:p-16")}>
+          <div className={cn("hud flex items-center justify-between text-muted-foreground", panel ? "mb-5" : "mb-8")}>
             <span>[ START HERE ]</span>
             <span className="text-signal">●</span>
           </div>
-          <h3 className="display max-w-4xl text-pretty text-[8vw] leading-[0.95] text-foreground md:text-[4vw]">
+          <h3
+            className={cn(
+              "display max-w-4xl text-pretty leading-[0.95] text-foreground",
+              panel ? "text-[7vw] md:text-[2.6vw]" : "text-[8vw] md:text-[4vw]",
+            )}
+          >
             If the screen has been winning, today is the day you start winning
             it back.
           </h3>
-          <div className="mt-12 flex flex-col gap-3 sm:flex-row">
+          <div className={cn("flex flex-col gap-3 sm:flex-row", panel ? "mt-8" : "mt-12")}>
             <Magnetic strength={0.5}>
               <a
                 href="#top"

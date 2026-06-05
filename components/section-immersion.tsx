@@ -109,13 +109,13 @@ export function SectionImmersion() {
       // the flanking copy slides away + fades as you cross the threshold into
       // the frame. starts only AFTER the hold, so the grow is a deliberate act.
       const openAt = hold
-      const openDur = 9
+      const openDur = 11
       // smooth, eased reveal so the frame glides open and *settles* into
-      // full-bleed instead of snapping. power2.inOut = slow start, steady
-      // middle, gentle landing — the cinematic "step inside" feel.
+      // full-bleed instead of snapping. power3.inOut = gentle start, steady
+      // middle, soft landing — the cinematic "step inside / sink in" feel.
       tl.to(
         wrap,
-        { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: openDur, ease: "power2.inOut" },
+        { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: openDur, ease: "power3.inOut" },
         openAt,
       )
         .to(
@@ -124,7 +124,7 @@ export function SectionImmersion() {
             scale: endScale,
             filter: "brightness(1) saturate(1.18) contrast(1.08)",
             duration: openDur,
-            ease: "power2.inOut",
+            ease: "power3.inOut",
           },
           openAt,
         )
