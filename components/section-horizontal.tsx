@@ -30,7 +30,11 @@ export function SectionHorizontal() {
 
       // Desktop / tablet only: pin the section and translate the track left by
       // exactly the overflow width, so the second panel arrives from the right.
-      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+      // NOTE: this is a scroll-DRIVEN effect (it only moves when the user
+      // scrolls, nothing auto-animates), so we intentionally run it even when
+      // the OS "reduce motion" setting is on. Mobile still falls back to a
+      // normal vertical stack via the (min-width: 768px) gate below.
+      mm.add("(min-width: 768px)", () => {
         const tween = gsap.to(track, {
           x: () => -(track.scrollWidth - window.innerWidth),
           ease: "none",
