@@ -69,58 +69,40 @@ export function SectionSigns() {
         const caps = gsap.utils.toArray<HTMLElement>("[data-cap]", el)
         const count = panels.length
 
-        // Each step "holds" while you read, then a short transition swaps text.
-        const HOLD = 1
-        const TRANS = 0.5
-        const total = HOLD * count + TRANS * (count - 1)
-
         // Initial state: only the first step visible.
         gsap.set(panels, { autoAlpha: 0, yPercent: 8 })
         gsap.set(caps, { autoAlpha: 0 })
         gsap.set([panels[0], caps[0]], { autoAlpha: 1, yPercent: 0 })
 
-        // Progress value (0–1) at the start of each step's hold — snap targets.
-        const snapPoints: number[] = []
-
+        // The timeline is only made of step→step transitions, so step i rests
+        // at progress i/(count-1): step 0 at 0 and the LAST step at exactly 1,
+        // i.e. the end of the pin. That way reading the final step and scrolling
+        // releases the whole section instead of dragging it while frozen.
         const tl = gsap.timeline({
           defaults: { ease: "power2.inOut" },
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            // One viewport of scroll per step so each gets room to rest on.
+            // One viewport of scroll per transition between steps.
             end: () => "+=" + window.innerHeight * (count - 1),
             pin: true,
             scrub: 0.6,
             snap: {
-              snapTo: (value) =>
-                snapPoints.reduce((prev, curr) =>
-                  Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev,
-                ),
+              snapTo: gsap.utils.snap(1 / (count - 1)),
               duration: { min: 0.2, max: 0.5 },
               ease: "power1.inOut",
             },
           },
         })
 
-        // Step 0 holds first.
-        snapPoints.push(0)
-        tl.to({}, { duration: HOLD })
-
         for (let i = 1; i < count; i++) {
-          // Quick crossfade between steps.
-          tl.to([panels[i - 1], caps[i - 1]], {
-            autoAlpha: 0,
-            yPercent: -8,
-            duration: TRANS,
-          }).fromTo(
-            [panels[i], caps[i]],
-            { autoAlpha: 0, yPercent: 8 },
-            { autoAlpha: 1, yPercent: 0, duration: TRANS },
-            "<",
-          )
-          // The new step holds here so it can be read before scrolling on.
-          snapPoints.push(tl.duration() / total)
-          tl.to({}, { duration: HOLD })
+          tl.to([panels[i - 1], caps[i - 1]], { autoAlpha: 0, yPercent: -8 }, i)
+            .fromTo(
+              [panels[i], caps[i]],
+              { autoAlpha: 0, yPercent: 8 },
+              { autoAlpha: 1, yPercent: 0 },
+              i,
+            )
         }
       })
 
