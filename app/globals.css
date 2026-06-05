@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-aquire), 'Helvetica Neue', Arial, sans-serif;
+  --font-heading: var(--font-geist-sans), 'Helvetica Neue', Arial, sans-serif;
   --font-sans: var(--font-geist-sans), 'Geist Fallback';
   --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
   --color-signal: var(--signal);
@@ -131,14 +131,11 @@
     font-size: 0.7rem;
     line-height: 1.2;
   }
-  /* Tight brutalist display headline. Aquire (the section-heading face) is a
-     single-weight uppercase geometric font, so it needs near-neutral tracking
-     and its real 400 weight instead of the synthetic bold the old Geist
-     headline used. */
+  /* Tight brutalist display headline */
   .display {
     font-family: var(--font-heading);
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.04em;
     line-height: 0.92;
   }
   /* Blanka — outlined display face for the hero headline only.
