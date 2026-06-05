@@ -114,13 +114,13 @@ export function SectionSigns() {
         className="grid gap-12 md:min-h-[78vh] md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-20"
       >
         {/* Left: text steps that scroll vertically inside a clipped window */}
-        <div className="md:h-[22em] md:overflow-hidden">
+        <div className="md:h-[26em] md:overflow-hidden">
           <div data-track className="md:flex md:flex-col">
             {steps.map((step, i) => (
               <div
                 key={i}
                 data-panel
-                className="flex flex-col justify-center md:h-[22em] [&:not(:first-child)]:mt-20 md:[&:not(:first-child)]:mt-0"
+                className="flex flex-col justify-center md:h-[26em] [&:not(:first-child)]:mt-20 md:[&:not(:first-child)]:mt-0"
               >
                 <h2 className="display text-balance text-[10vw] leading-[0.95] text-foreground md:text-[5vw]">
                   {step.heading}
