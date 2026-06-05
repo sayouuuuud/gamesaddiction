@@ -1,0 +1,254 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-geist-sans), 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-geist-sans), 'Geist Fallback';
+  --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
+  --color-signal: var(--signal);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  /* Paper white + ink black, single signal-red accent */
+  --background: oklch(0.985 0.001 90);
+  --foreground: oklch(0.16 0.003 280);
+  --card: oklch(0.985 0.001 90);
+  --card-foreground: oklch(0.16 0.003 280);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0.003 280);
+  --primary: oklch(0.16 0.003 280);
+  --primary-foreground: oklch(0.985 0.001 90);
+  --secondary: oklch(0.95 0.001 90);
+  --secondary-foreground: oklch(0.16 0.003 280);
+  --muted: oklch(0.95 0.001 90);
+  --muted-foreground: oklch(0.5 0.004 280);
+  --accent: oklch(0.95 0.001 90);
+  --accent-foreground: oklch(0.16 0.003 280);
+  --destructive: oklch(0.55 0.23 27);
+  --signal: oklch(0.58 0.236 27);
+  --border: oklch(0.16 0.003 280 / 14%);
+  --input: oklch(0.16 0.003 280 / 18%);
+  --ring: oklch(0.16 0.003 280);
+  --chart-1: oklch(0.16 0.003 280);
+  --chart-2: oklch(0.58 0.236 27);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.25rem;
+  --sidebar: oklch(0.985 0.001 90);
+  --sidebar-foreground: oklch(0.16 0.003 280);
+  --sidebar-primary: oklch(0.16 0.003 280);
+  --sidebar-primary-foreground: oklch(0.985 0.001 90);
+  --sidebar-accent: oklch(0.95 0.001 90);
+  --sidebar-accent-foreground: oklch(0.16 0.003 280);
+  --sidebar-border: oklch(0.16 0.003 280 / 14%);
+  --sidebar-ring: oklch(0.16 0.003 280);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    /* keep scrollbars on-theme instead of the OS default dark chrome */
+    scrollbar-color: oklch(0.16 0.003 280 / 35%) transparent;
+    scrollbar-width: thin;
+    /* never expose a stray horizontal scrollbar from animated/oversized art */
+    overflow-x: clip;
+    /* Always reserve room for the vertical scrollbar. The preloader locks
+       scrolling with overflow:hidden while loading, then releases it on
+       finish. Without a reserved gutter the scrollbar pops in on release and
+       shoves the whole layout sideways — the jolt you see on first load.
+       "stable" keeps the gutter present in both states, so nothing shifts. */
+    scrollbar-gutter: stable;
+  }
+  /* WebKit / Chromium scrollbars styled to match the paper + ink palette */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.16 0.003 280 / 28%);
+    border: 3px solid var(--background);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.16 0.003 280 / 45%);
+  }
+}
+
+@layer utilities {
+  /* Monospace HUD label */
+  .hud {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+  /* Tight brutalist display headline */
+  .display {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+  }
+  /* Blanka — outlined display face for the hero headline only.
+     It is uppercase + fixed-width, so it needs positive tracking (the tight
+     negative tracking of .display would overlap its open letterforms). */
+  .display-hero {
+    font-family: var(--font-blanka), 'Arial Black', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 0.9;
+  }
+  /* Animated film grain — overlay for the immersion footage */
+  .fx-grain::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    animation: grain-shift 0.6s steps(3) infinite;
+    will-change: transform;
+  }
+  /* Heavy cinematic vignette — pulls focus to the center, edges go black */
+  .fx-vignette::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 90% at 50% 50%,
+      transparent 38%,
+      oklch(0.03 0.01 280 / 55%) 78%,
+      oklch(0.02 0.01 280 / 92%) 100%
+    );
+  }
+  /* CRT scanlines */
+  .fx-scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      oklch(0 0 0 / 22%) 0px,
+      oklch(0 0 0 / 22%) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+  /* Faint engineering crosshair grid */
+  .bg-crosshair {
+    background-image: radial-gradient(
+      circle,
+      oklch(0.16 0.003 280 / 16%) 1px,
+      transparent 1.4px
+    );
+    background-size: 80px 80px;
+    background-position: 40px 40px;
+  }
+  .clip-hidden {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+/* Marquee */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Film grain jitter */
+@keyframes grain-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-4%, 3%);
+  }
+  66% {
+    transform: translate(3%, -4%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Dopamine oscilloscope — scroll the doubled waveform endlessly to the left */
+@keyframes eeg-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Sweep readout bar that fills + resets, like a live reward cycle */
+@keyframes reward-sweep {
+  0% {
+    transform: scaleX(0.05);
+  }
+  70% {
+    transform: scaleX(1);
+  }
+  72% {
+    transform: scaleX(0.05);
+  }
+  100% {
+    transform: scaleX(0.05);
+  }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
