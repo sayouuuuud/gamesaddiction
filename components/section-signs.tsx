@@ -65,28 +65,26 @@ export function SectionSigns() {
 
       // Pinned, scroll-driven story — desktop only.
       mm.add("(min-width: 768px)", () => {
-        const panels = gsap.utils.toArray<HTMLElement>("[data-panel]", el)
-        const caps = gsap.utils.toArray<HTMLElement>("[data-cap]", el)
-        const count = panels.length
+        const track = el.querySelector<HTMLElement>("[data-track]")
+        const capTrack = el.querySelector<HTMLElement>("[data-cap-track]")
+        const count = el.querySelectorAll("[data-panel]").length
+        if (!track) return
 
-        // Initial state: only the first step visible.
-        gsap.set(panels, { autoAlpha: 0, yPercent: 8 })
-        gsap.set(caps, { autoAlpha: 0 })
-        gsap.set([panels[0], caps[0]], { autoAlpha: 1, yPercent: 0 })
+        // Each track holds `count` stacked, equal-height panels. Sliding it up
+        // by (count-1)/count of its own height scrolls from the first step to
+        // the last — a real vertical scroll of the text, nothing fades in.
+        const move = -100 * ((count - 1) / count)
 
-        // The timeline is only made of step→step transitions, so step i rests
-        // at progress i/(count-1): step 0 at 0 and the LAST step at exactly 1,
-        // i.e. the end of the pin. That way reading the final step and scrolling
-        // releases the whole section instead of dragging it while frozen.
         const tl = gsap.timeline({
-          defaults: { ease: "power2.inOut" },
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            // One viewport of scroll per transition between steps.
+            // One viewport of scroll per step transition.
             end: () => "+=" + window.innerHeight * (count - 1),
             pin: true,
             scrub: 0.6,
+            // Rest on each step; the last one rests at progress 1 (pin end), so
+            // reading it and scrolling on releases the whole section naturally.
             snap: {
               snapTo: gsap.utils.snap(1 / (count - 1)),
               duration: { min: 0.2, max: 0.5 },
@@ -95,15 +93,8 @@ export function SectionSigns() {
           },
         })
 
-        for (let i = 1; i < count; i++) {
-          tl.to([panels[i - 1], caps[i - 1]], { autoAlpha: 0, yPercent: -8 }, i)
-            .fromTo(
-              [panels[i], caps[i]],
-              { autoAlpha: 0, yPercent: 8 },
-              { autoAlpha: 1, yPercent: 0 },
-              i,
-            )
-        }
+        tl.to(track, { yPercent: move, ease: "none" }, 0)
+        if (capTrack) tl.to(capTrack, { yPercent: move, ease: "none" }, 0)
       })
 
       return () => mm.revert()
@@ -126,25 +117,27 @@ export function SectionSigns() {
         ref={pinRef}
         className="grid gap-12 md:min-h-[78vh] md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-20"
       >
-        {/* Left: scroll-driven text steps */}
-        <div className="relative md:min-h-[26em]">
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              data-panel
-              className="md:absolute md:inset-0 md:flex md:flex-col md:justify-center [&:not(:first-child)]:mt-20 md:[&:not(:first-child)]:mt-0"
-            >
-              <h2 className="display text-balance text-[10vw] leading-[0.95] text-foreground md:text-[5vw]">
-                {step.heading}
-              </h2>
-              <p className="mt-8 max-w-md text-pretty leading-relaxed text-muted-foreground">
-                {step.body}
-              </p>
-            </div>
-          ))}
+        {/* Left: text steps that scroll vertically inside a clipped window */}
+        <div className="md:h-[22em] md:overflow-hidden">
+          <div data-track className="md:flex md:flex-col">
+            {steps.map((step, i) => (
+              <div
+                key={i}
+                data-panel
+                className="flex flex-col justify-center md:h-[22em] [&:not(:first-child)]:mt-20 md:[&:not(:first-child)]:mt-0"
+              >
+                <h2 className="display text-balance text-[10vw] leading-[0.95] text-foreground md:text-[5vw]">
+                  {step.heading}
+                </h2>
+                <p className="mt-8 max-w-md text-pretty leading-relaxed text-muted-foreground">
+                  {step.body}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Right: pinned image with a changing caption */}
+        {/* Right: image stays put while the caption scrolls in sync */}
         <div className="relative hidden md:block">
           <MediaReveal className="rounded-md">
             <Image
@@ -155,16 +148,17 @@ export function SectionSigns() {
               className="h-auto w-full grayscale"
             />
           </MediaReveal>
-          <div className="absolute -bottom-3 left-3 h-6">
-            {steps.map((step, i) => (
-              <div
-                key={i}
-                data-cap
-                className="hud absolute bottom-0 left-0 whitespace-nowrap bg-background px-2 py-1 text-muted-foreground"
-              >
-                {step.fig}
-              </div>
-            ))}
+          <div className="absolute -bottom-3 left-3 h-6 overflow-hidden">
+            <div data-cap-track className="flex flex-col">
+              {steps.map((step, i) => (
+                <div
+                  key={i}
+                  className="hud flex h-6 items-center whitespace-nowrap bg-background px-2 text-muted-foreground"
+                >
+                  {step.fig}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
